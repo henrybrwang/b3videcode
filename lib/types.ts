@@ -1,14 +1,14 @@
 export interface ReceiptLine {
   id: string;
+  fileName: string; // Source receipt filename
   date: string;
-  supplier: string;
-  amount: number;
+  task: string; // Task category name
+  description: string;
+  quantity: number;
+  unitPrice: number;
   currency: string;
-  category: string;
-  vatRate: number;
-  amountExclVat: number;
-  isDomestic: boolean;
-  description?: string;
+  taxCode: number; // VAT percentage (0, 6, 12, 25)
+  amount: number; // Total amount
 }
 
 export interface ExtractionResult {

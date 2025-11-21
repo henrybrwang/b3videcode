@@ -14,20 +14,20 @@ async function convertPdfToImage(pdfBuffer: ArrayBuffer): Promise<{ data: string
   try {
     const pdf = await pdfjsLib.getDocument({ data: pdfBuffer }).promise;
     const page = await pdf.getPage(1); // Get first page
-    
+
     const viewport = page.getViewport({ scale: 2.0 });
-    
+
     // Create a canvas
     const canvas = {
       width: viewport.width,
       height: viewport.height,
       getContext: () => null,
     };
-    
+
     // For server-side, we need to use node-canvas or similar
     // For simplicity, we'll render to base64
     const { createCanvas } = await import('canvas' as any).catch(() => null);
-    
+
     if (!createCanvas) {
       // Fallback: just use the PDF data directly
       // Gemini can handle PDF format
@@ -37,18 +37,18 @@ async function convertPdfToImage(pdfBuffer: ArrayBuffer): Promise<{ data: string
         mimeType: 'application/pdf',
       };
     }
-    
+
     const nodeCanvas = createCanvas(viewport.width, viewport.height);
     const context = nodeCanvas.getContext('2d');
-    
+
     await page.render({
       canvasContext: context,
       viewport: viewport,
     }).promise;
-    
+
     // Convert to base64
     const imageData = nodeCanvas.toDataURL('image/png').split(',')[1];
-    
+
     return {
       data: imageData,
       mimeType: 'image/png',
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
-    
+
     let imageData: string;
     let mimeType: string;
 
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract data using Gemini
-    const result = await extractReceiptData(imageData, mimeType);
+    const result = await extractReceiptData(imageData, mimeType, file.name);
 
     return NextResponse.json(result);
   } catch (error) {

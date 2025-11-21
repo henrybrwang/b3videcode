@@ -15,14 +15,14 @@ export default function ExportButton({ lines, disabled = false }: ExportButtonPr
     // Prepare data for CSV export in Maconomy format
     const csvData = lines.map(line => ({
       Datum: line.date,
-      Leverantör: line.supplier,
+      Filnamn: line.fileName,
+      Uppgift: line.task,
       Beskrivning: line.description || '',
-      'Belopp inkl. moms': line.amount.toFixed(2),
+      Antal: line.quantity.toFixed(2),
+      Styckpris: line.unitPrice.toFixed(2),
       Valuta: line.currency,
-      'Momssats (%)': line.vatRate.toFixed(2),
-      'Belopp exkl. moms': line.amountExclVat.toFixed(2),
-      Inrikes: line.isDomestic ? 'Ja' : 'Nej',
-      Kategori: line.category,
+      'Moms (%)': line.taxCode.toFixed(2),
+      Belopp: line.amount.toFixed(2),
     }));
 
     // Convert to CSV
@@ -35,11 +35,11 @@ export default function ExportButton({ lines, disabled = false }: ExportButtonPr
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute('href', url);
     link.setAttribute('download', `maconomy_export_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -76,4 +76,3 @@ export default function ExportButton({ lines, disabled = false }: ExportButtonPr
     </button>
   );
 }
-

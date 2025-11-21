@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 
 interface UploadZoneProps {
-  onFileSelect: (file: File) => void;
+  onFileSelect: (files: File[]) => void;
   isProcessing?: boolean;
 }
 
@@ -26,15 +26,29 @@ export default function UploadZone({ onFileSelect, isProcessing = false }: Uploa
     return null;
   };
 
-  const handleFile = useCallback((file: File) => {
-    const validationError = validateFile(file);
-    if (validationError) {
-      setError(validationError);
-      return;
+  const handleFiles = useCallback((files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const validFiles: File[] = [];
+    const errors: string[] = [];
+
+    fileArray.forEach((file, index) => {
+      const validationError = validateFile(file);
+      if (validationError) {
+        errors.push(`${file.name}: ${validationError}`);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (errors.length > 0) {
+      setError(errors.join('\n'));
+    } else {
+      setError(null);
     }
 
-    setError(null);
-    onFileSelect(file);
+    if (validFiles.length > 0) {
+      onFileSelect(validFiles);
+    }
   }, [onFileSelect]);
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -43,11 +57,10 @@ export default function UploadZone({ onFileSelect, isProcessing = false }: Uploa
 
     if (isProcessing) return;
 
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFile(file);
+    if (e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
     }
-  }, [handleFile, isProcessing]);
+  }, [handleFiles, isProcessing]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -62,11 +75,10 @@ export default function UploadZone({ onFileSelect, isProcessing = false }: Uploa
   }, []);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFile(file);
+    if (e.target.files && e.target.files.length > 0) {
+      handleFiles(e.target.files);
     }
-  }, [handleFile]);
+  }, [handleFiles]);
 
   return (
     <div className="w-full">
@@ -84,10 +96,11 @@ export default function UploadZone({ onFileSelect, isProcessing = false }: Uploa
           type="file"
           onChange={handleFileInput}
           accept=".pdf,.jpg,.jpeg,.png"
+          multiple
           disabled={isProcessing}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
         />
-        
+
         <div className="space-y-4">
           <div className="flex justify-center">
             <svg
@@ -104,22 +117,22 @@ export default function UploadZone({ onFileSelect, isProcessing = false }: Uploa
               />
             </svg>
           </div>
-          
+
           <div>
             <p className="text-lg font-medium text-gray-700">
-              {isProcessing ? 'Bearbetar...' : 'Dra och släpp ett kvitto här'}
+              {isProcessing ? 'Bearbetar...' : 'Dra och släpp dina kvitton här'}
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              eller klicka för att välja en fil
+              eller klicka för att välja kvittofiler.
             </p>
           </div>
-          
+
           <p className="text-xs text-gray-400">
             PDF, JPG eller PNG (max 10MB)
           </p>
         </div>
       </div>
-      
+
       {error && (
         <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-600">{error}</p>

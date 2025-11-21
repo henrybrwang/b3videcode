@@ -12,31 +12,42 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleFileSelect = async (file: File) => {
+  const handleFileSelect = async (files: File[]) => {
     setIsProcessing(true);
     setError(null);
     setSuccessMessage(null);
 
+    let totalLinesExtracted = 0;
+    const newLines: ReceiptLine[] = [];
+
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setSuccessMessage(`Bearbetar fil ${i + 1} av ${files.length}: ${file.name}...`);
 
-      const response = await fetch('/api/extract', {
-        method: 'POST',
-        body: formData,
-      });
+        const formData = new FormData();
+        formData.append('file', file);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to process receipt');
+        const response = await fetch('/api/extract', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Fel vid bearbetning av ${file.name}: ${errorData.error || 'Unknown error'}`);
+        }
+
+        const result: ExtractionResult = await response.json();
+        newLines.push(...result.lines);
+        totalLinesExtracted += result.lines.length;
       }
 
-      const result: ExtractionResult = await response.json();
-      setLines(result.lines);
-      setSuccessMessage(`Lyckades extrahera ${result.lines.length} rad(er) från kvittot!`);
+      setLines(prevLines => [...prevLines, ...newLines]);
+      setSuccessMessage(`Lyckades extrahera ${totalLinesExtracted} rad(er) från ${files.length} kvitto(n)!`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod vid bearbetning av kvittot');
-      console.error('Error processing receipt:', err);
+      setError(err instanceof Error ? err.message : 'Ett fel uppstod vid bearbetning av kvitton');
+      console.error('Error processing receipts:', err);
     } finally {
       setIsProcessing(false);
     }
@@ -69,7 +80,7 @@ export default function Home() {
             MacEasy - Receipt OCR
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Ladda upp ett kvitto och låt AI:n extrahera information för Maconomy-import
+            Ladda upp dina kvitton och låt AI:n extrahera information för Maconomy-import
           </p>
         </div>
 
@@ -138,21 +149,15 @@ export default function Home() {
             {/* Summary */}
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Sammanfattning</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <p className="text-sm text-blue-600 font-medium">Antal rader</p>
                   <p className="text-2xl font-bold text-blue-900">{lines.length}</p>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg">
-                  <p className="text-sm text-green-600 font-medium">Total summa (inkl. moms)</p>
+                  <p className="text-sm text-green-600 font-medium">Total summa</p>
                   <p className="text-2xl font-bold text-green-900">
                     {lines.reduce((sum, line) => sum + line.amount, 0).toFixed(2)} {lines[0]?.currency || 'SEK'}
-                  </p>
-                </div>
-                <div className="p-4 bg-purple-50 rounded-lg">
-                  <p className="text-sm text-purple-600 font-medium">Total summa (exkl. moms)</p>
-                  <p className="text-2xl font-bold text-purple-900">
-                    {lines.reduce((sum, line) => sum + line.amountExclVat, 0).toFixed(2)} {lines[0]?.currency || 'SEK'}
                   </p>
                 </div>
               </div>
@@ -169,7 +174,7 @@ export default function Home() {
                 <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full font-semibold mr-3">
                   1
                 </span>
-                <span>Ladda upp ett kvitto som PDF eller bild (JPG, PNG)</span>
+                <span>Ladda upp ett eller flera kvitton som PDF eller bild (JPG, PNG)</span>
               </li>
               <li className="flex items-start">
                 <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full font-semibold mr-3">

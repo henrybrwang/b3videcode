@@ -18,6 +18,20 @@ export default function ResultsTable({ lines, onUpdateLine, onDeleteLine }: Resu
     onUpdateLine(id, { [field]: value });
   };
 
+  const handleQuantityOrPriceChange = (id: string, field: 'quantity' | 'unitPrice', value: number) => {
+    const line = lines.find(l => l.id === id);
+    if (!line) return;
+
+    const newQuantity = field === 'quantity' ? value : line.quantity;
+    const newUnitPrice = field === 'unitPrice' ? value : line.unitPrice;
+    const newAmount = newQuantity * newUnitPrice;
+
+    onUpdateLine(id, {
+      [field]: value,
+      amount: Math.round(newAmount * 100) / 100,
+    });
+  };
+
   return (
     <div className="w-full overflow-x-auto bg-white rounded-lg shadow">
       <table className="min-w-full divide-y divide-gray-200">
@@ -27,13 +41,19 @@ export default function ResultsTable({ lines, onUpdateLine, onDeleteLine }: Resu
               Datum
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Leverantör
+              Filnamn
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Uppgift
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Beskrivning
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Belopp (inkl. moms)
+              Antal
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Styckpris
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Valuta
@@ -42,13 +62,7 @@ export default function ResultsTable({ lines, onUpdateLine, onDeleteLine }: Resu
               Moms %
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Belopp (exkl. moms)
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Inrikes
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Kategori
+              Belopp
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Åtgärd
@@ -63,45 +77,59 @@ export default function ResultsTable({ lines, onUpdateLine, onDeleteLine }: Resu
                   type="date"
                   value={line.date}
                   onChange={(e) => handleCellChange(line.id, 'date', e.target.value)}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2 py-1 text-sm text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {line.fileName}
+              </td>
               <td className="px-4 py-3">
-                <input
-                  type="text"
-                  value={line.supplier}
-                  onChange={(e) => handleCellChange(line.id, 'supplier', e.target.value)}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <select
+                  value={line.task}
+                  onChange={(e) => handleCellChange(line.id, 'task', e.target.value)}
+                  className="w-full px-2 py-1 text-sm text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {MACONOMY_CATEGORIES.map((cat) => (
+                    <option key={cat.code} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
               </td>
               <td className="px-4 py-3">
                 <input
                   type="text"
                   value={line.description || ''}
                   onChange={(e) => handleCellChange(line.id, 'description', e.target.value)}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2 py-1 text-sm text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Beskrivning"
                 />
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
                 <input
                   type="number"
-                  value={line.amount}
-                  onChange={(e) => {
-                    const amount = parseFloat(e.target.value);
-                    const amountExclVat = amount / (1 + line.vatRate / 100);
-                    handleCellChange(line.id, 'amount', amount);
-                    handleCellChange(line.id, 'amountExclVat', Math.round(amountExclVat * 100) / 100);
-                  }}
+                  value={line.quantity}
+                  onChange={(e) => handleQuantityOrPriceChange(line.id, 'quantity', parseFloat(e.target.value) || 0)}
                   step="0.01"
-                  className="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="0"
+                  className="w-20 px-2 py-1 text-sm text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap">
+                <input
+                  type="number"
+                  value={line.unitPrice}
+                  onChange={(e) => handleQuantityOrPriceChange(line.id, 'unitPrice', parseFloat(e.target.value) || 0)}
+                  step="0.01"
+                  min="0"
+                  className="w-24 px-2 py-1 text-sm text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
                 <select
                   value={line.currency}
                   onChange={(e) => handleCellChange(line.id, 'currency', e.target.value)}
-                  className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-20 px-2 py-1 text-sm text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="SEK">SEK</option>
                   <option value="EUR">EUR</option>
@@ -113,40 +141,16 @@ export default function ResultsTable({ lines, onUpdateLine, onDeleteLine }: Resu
               <td className="px-4 py-3 whitespace-nowrap">
                 <input
                   type="number"
-                  value={line.vatRate}
-                  onChange={(e) => {
-                    const vatRate = parseFloat(e.target.value);
-                    const amountExclVat = line.amount / (1 + vatRate / 100);
-                    handleCellChange(line.id, 'vatRate', vatRate);
-                    handleCellChange(line.id, 'amountExclVat', Math.round(amountExclVat * 100) / 100);
-                  }}
+                  value={line.taxCode}
+                  onChange={(e) => handleCellChange(line.id, 'taxCode', parseFloat(e.target.value) || 0)}
                   step="0.01"
-                  className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="0"
+                  max="100"
+                  className="w-20 px-2 py-1 text-sm text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                {line.amountExclVat.toFixed(2)}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap">
-                <input
-                  type="checkbox"
-                  checked={line.isDomestic}
-                  onChange={(e) => handleCellChange(line.id, 'isDomestic', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-              </td>
-              <td className="px-4 py-3">
-                <select
-                  value={line.category}
-                  onChange={(e) => handleCellChange(line.id, 'category', e.target.value)}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {MACONOMY_CATEGORIES.map((cat) => (
-                    <option key={cat.code} value={cat.code}>
-                      {formatCategoryOption(cat)}
-                    </option>
-                  ))}
-                </select>
+              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 font-medium">
+                {line.amount.toFixed(2)}
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
                 <button
@@ -164,4 +168,3 @@ export default function ResultsTable({ lines, onUpdateLine, onDeleteLine }: Resu
     </div>
   );
 }
-
