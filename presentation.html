@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacEasy - Receipt OCR Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        /* Section Styling */
+        .section {
+            background: white;
+            margin: 40px 0;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease-out;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* Tech Stack */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .tech-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Steps */
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-block code {
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>🧾 MacEasy</h1>
+        <p>AI-driven Receipt OCR for Maconomy</p>
+    </div>
+
+    <div class="container">
+        <!-- Overview Section -->
+        <div class="section">
+            <h2>📋 Översikt</h2>
+            <p>MacEasy är en modern Next.js-applikation som använder Google Gemini AI för att automatiskt extrahera kvittoinformation och förbereda data för import i Maconomy redovisningssystem. Applikationen stödjer både ljust och mörkt läge, samt hantering av flera kvitton samtidigt.</p>
+        </div>
+
+        <!-- Features Section -->
+        <div class="section">
+            <h2>✨ Funktioner</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">📤</div>
+                    <h4>Flera Filer</h4>
+                    <p>Ladda upp flera kvitton samtidigt (PDF, JPG, PNG)</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h4>AI-Extraktion</h4>
+                    <p>Automatisk information med Google Gemini 2.5 Flash</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h4>Smart Kategorisering</h4>
+                    <p>Intelligent matchning mot Maconomy-kategorier</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✏️</div>
+                    <h4>Redigerbar Tabell</h4>
+                    <p>Granska och justera extraherad data</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h4>CSV Export</h4>
+                    <p>Export till CSV för direkt Maconomy-import</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌓</div>
+                    <h4>Dark Mode</h4>
+                    <p>Fullständigt stöd för ljust och mörkt läge</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack Section -->
+        <div class="section">
+            <h2>🛠️ Teknisk Stack</h2>
+            <div class="tech-stack">
+                <span class="tech-badge">Next.js 15</span>
+                <span class="tech-badge">React 18</span>
+                <span class="tech-badge">TypeScript</span>
+                <span class="tech-badge">Tailwind CSS</span>
+                <span class="tech-badge">Google Gemini AI</span>
+                <span class="tech-badge">PDF.js</span>
+                <span class="tech-badge">PapaParse</span>
+            </div>
+
+            <h3>Arkitektur</h3>
+            <ul style="margin-top: 20px; line-height: 2;">
+                <li><strong>Frontend:</strong> Server-Side Rendering med Next.js App Router</li>
+                <li><strong>AI Integration:</strong> Google Gemini 2.5 Flash API</li>
+                <li><strong>Styling:</strong> Tailwind CSS med dark mode-stöd</li>
+                <li><strong>State Management:</strong> React hooks (useState)</li>
+                <li><strong>File Processing:</strong> Client-side med FormData API</li>
+            </ul>
+        </div>
+
+        <!-- How It Works Section -->
+        <div class="section">
+            <h2>⚙️ Hur det fungerar</h2>
+            <ol class="steps">
+                <li>Användaren laddar upp ett eller flera kvitton (PDF/bild)</li>
+                <li>Filer konverteras till base64 och skickas till API:et</li>
+                <li>Google Gemini AI analyserar bilden och extraherar strukturerad data</li>
+                <li>Data visas i en redigerbar tabell med filnamn-spårning</li>
+                <li>Användaren kan granska, redigera och exportera till CSV</li>
+            </ol>
+
+            <h3>AI Prompt-strategi</h3>
+            <p style="margin-top: 20px;">
+                Gemini-modellen får en detaljerad prompt med alla Maconomy-kategorier och instruktioner för att:
+            </p>
+            <ul style="margin-top: 15px; line-height: 2; margin-left: 30px;">
+                <li>Extrahera datum, uppgift, beskrivning, antal och styckpris</li>
+                <li>Identifiera om kvittot är utländskt (sätter automatiskt moms till 0%)</li>
+                <li>Dela upp transaktioner baserat på olika momssatser</li>
+                <li>Beräkna totalt belopp (antal × styckpris)</li>
+                <li>Föreslå lämplig kategori från 19 förutbestämda alternativ</li>
+            </ul>
+        </div>
+
+        <!-- Data Structure Section -->
+        <div class="section">
+            <h2>📝 Datastruktur</h2>
+            <h3>ReceiptLine Interface</h3>
+            <div class="code-block">
+<code>interface ReceiptLine {
+  id: string;           // Unique identifier
+  fileName: string;     // Source file name
+  date: string;         // Transaction date (YYYY-MM-DD)
+  task: string;         // Maconomy category
+  description: string;  // Purchase description
+  quantity: number;     // Number of units
+  unitPrice: number;    // Price per unit (incl. VAT)
+  currency: string;     // Currency code (SEK, EUR, etc.)
+  taxCode: number;      // VAT percentage (0, 6, 12, 25)
+  amount: number;       // Total amount (quantity × unitPrice)
+}</code>
+            </div>
+
+            <h3>Maconomy Kategorier (19 st)</h3>
+            <p style="margin-top: 20px;">
+                Inköp hårdvara, Programvara, Förbrukningsmaterial, Trängselskatt, 
+                Övriga förmånsbilkostnader, Flygresor, Resekostnader, Parkering, 
+                Hotell Sverige, Hotell Utland, Extern representation, Kontorsmatrial, 
+                Telefon- & bredbandsabonnemang, Utbildning, Friskvård, Intern representation, 
+                Övriga personalkostnader, Kaffe, fika m.m., Inget av ovanstående - övrigt
+            </p>
+        </div>
+
+        <!-- Installation Section -->
+        <div class="section">
+            <h2>🚀 Installation & Användning</h2>
+            <h3>Setup</h3>
+            <div class="code-block">
+<code># Klona projektet
+git clone https://github.com/henrybrwang/b3videcode.git
+
+# Installera dependencies
+npm install
+
+# Skapa .env.local fil
+echo "GEMINI_API_KEY=your_api_key_here" > .env.local
+
+# Starta utvecklingsserver
+npm run dev
+
+# Öppna http://localhost:3000</code>
+            </div>
+
+            <h3>Produktionsbygge</h3>
+            <div class="code-block">
+<code>npm run build
+npm start</code>
+            </div>
+        </div>
+
+        <!-- Key Features Section -->
+        <div class="section">
+            <h2>🎯 Nyckelfunktioner</h2>
+            
+            <h3>Multi-fil Upload</h3>
+            <p>Hantera flera kvitton samtidigt med sekventiell bearbetning och ackumulerade resultat.</p>
+            
+            <h3>Filnamn-spårning</h3>
+            <p>Varje extraherad rad visar källfilens namn för enkel identifiering vid batch-import.</p>
+            
+            <h3>Dark Mode</h3>
+            <p>Fullständigt implementerat dark mode med localStorage-persistence och system-preferens-detektering.</p>
+            
+            <h3>Responsiv Design</h3>
+            <p>Fungerar smidigt på desktop, tablet och mobil med Tailwind's responsiva grid-system.</p>
+
+            <h3>Säkerhet</h3>
+            <ul style="margin-top: 15px; line-height: 2; margin-left: 30px;">
+                <li>API-nyckeln lagras säkert i .env.local (exponeras aldrig till klienten)</li>
+                <li>Filer bearbetas endast temporärt och sparas inte på servern</li>
+                <li>All data är volatil och rensas vid siduppdatering</li>
+            </ul>
+        </div>
+
+        <!-- Future Enhancements Section -->
+        <div class="section">
+            <h2>🔮 Framtida Förbättringar</h2>
+            <ul style="margin-top: 20px; line-height: 2; margin-left: 30px;">
+                <li>Database-integration för permanent lagring</li>
+                <li>Användarautentisering och multi-tenant stöd</li>
+                <li>Batch-export med historik</li>
+                <li>Avancerad rapportering och statistik</li>
+                <li>Integrerad Maconomy API för direkt import</li>
+                <li>OCR förbättringar med custom training</li>
+                <li>Support för fler valutor och språk</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Utvecklad med ❤️ för Maconomy-användare</p>
+        <p style="margin-top: 10px;">MacEasy © 2025</p>
+    </div>
+</body>
+</html>
